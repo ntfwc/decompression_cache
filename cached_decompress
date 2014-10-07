@@ -1,0 +1,68 @@
+#!/usr/bin/python
+
+from argparse import ArgumentParser
+
+import os.path
+
+DEFAULT_CACHE_LOCATION=os.path.join(os.path.expanduser("~"), ".cache/decompression_cache")
+DEFAULT_MAX_SIZE="1G"
+
+def __setUpParser():
+	parser = ArgumentParser(prog="cached_decompress", description='Cached file decompressor. Returns the path to the decompressed content.')
+	parser.add_argument("archiveFile", type=str, help="An archive file (.tar.gz, .tar.xz, .zip, .gz, .xz)")
+	parser.add_argument("-l", "--cache_location", default=DEFAULT_CACHE_LOCATION, help="Set the location of the cache folder to use.")
+	parser.add_argument("-m", "--max_size", default=DEFAULT_MAX_SIZE, help="Set the target max size of the cache.")
+	return parser
+
+def __parseArgs(args):
+	parser = __setUpParser()
+	return parser.parse_args(args)
+
+def __parseMaxSize(maxSizeArg):
+	if maxSizeArg.endswith("GB"):
+		return int(maxSizeArg[:-2])*1024**3
+	elif maxSizeArg.endswith("G"):
+		return int(maxSizeArg[:-1])*1024**3
+	elif maxSizeArg.endswith("MB"):
+		return int(maxSizeArg[:-2])*1024**2
+	elif maxSizeArg.endswith("M"):
+		return int(maxSizeArg[:-1])*1024**2
+	elif maxSizeArg.endswith("KB"):
+		return int(maxSizeArg[:-2])*1024
+	elif maxSizeArg.endswith("K"):
+		return int(maxSizeArg[:-1])*1024
+	elif maxSizeArg.endswith("B"):
+		return int(maxSizeArg[:-1])
+	else:
+		return int(maxSizeArg)
+
+import os.path
+from os import mkdir
+
+def __makeSureDefaultCacheLocationExists():
+	if not os.path.exists(DEFAULT_CACHE_LOCATION):
+		mkdir(DEFAULT_CACHE_LOCATION)
+
+from lib.Cache import Cache
+from lib.filehash.ShallowFileHashing import getShallowMD5Hash
+
+def main(args):
+	parsedArguments = __parseArgs(args)
+	archiveFile = parsedArguments.archiveFile
+	cacheLocation = parsedArguments.cache_location
+	try:
+		maxSize = __parseMaxSize(parsedArguments.max_size)
+	except:
+		print "Please give a valid max size (e.g. 1G, 1GB, 200M, 500KB)"
+		return
+	
+	if cacheLocation == DEFAULT_CACHE_LOCATION:
+		__makeSureDefaultCacheLocationExists()
+	
+	cache = Cache(cacheLocation, maxSize)
+	hexHash = getShallowMD5Hash(archiveFile).encode("hex")
+	print cache.recallOrCreateEntryAndGetContentPath(hexHash, archiveFile)
+
+from sys import argv
+if __name__ == "__main__":
+    main(argv[1:])
