@@ -18,7 +18,6 @@ def listFolders(directory):
 
 from operator import attrgetter
 
-
 class Cache(object):	
 	def __readOrRemoveCacheEntry(self, entryName):
 		entryPath = os.path.join(self.cacheFolder, entryName)
@@ -56,7 +55,7 @@ class Cache(object):
 	def __getCurrentCacheSize(self):
 		totalSize = 0
 		for cacheEntry in self.cacheEntryDict.values():
-			totalSize += cacheEntry.size
+			totalSize += cacheEntry.getTotalSize()
 		return totalSize
 	
 	def __getOldCacheEntriesSortedByLastAccess(self, newCacheEntry):
@@ -75,7 +74,7 @@ class Cache(object):
 		if currentSize > self.targetSize:
 			oldCacheEntryList = self.__getOldCacheEntriesSortedByLastAccess(newCacheEntry)
 			for entry in oldCacheEntryList:
-				currentSize -= entry.size
+				currentSize -= entry.getTotalSize()
 				self.__removeCacheEntry(entry)
 				if currentSize <= self.targetSize:
 					return

@@ -16,6 +16,8 @@ CONTENT_DIR = "content"
 SIZE_FILE_NAME = "size.bin"
 LAST_ACCESSED_FILE_NAME = "lastAccessed.bin"
 
+CACHE_ENTRY_METADATA_SIZE=16
+
 from time import time
 
 class CacheEntry(object):
@@ -48,6 +50,9 @@ class CacheEntry(object):
 	
 	def getKey(self):
 		return os.path.basename(self.path)
+	
+	def getTotalSize(self):
+		return self.size + CACHE_ENTRY_METADATA_SIZE
 
 
 def __verifyItems(entryPath):
