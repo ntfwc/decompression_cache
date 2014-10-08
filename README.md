@@ -8,7 +8,7 @@ This is a cache for file decompression. Useful for facilitating efficient access
 It takes an archive file from the command line and returns a path to the decompressed content:
 >cached_decompress [-h] [-l CACHE_LOCATION] [-m MAX_SIZE] archiveFile
 
-The program computes a shallow hash of the file (using its name, size, and last modified date). This hash is the key used in the cache for the file. To decompress archives it relies on external command line programs as determined by the file's extension. If the cache creates an entry and exceeds its max size, it removes entries starting with the least recently accessed. 
+The program computes a shallow hash of the file (using its name, size, and last modified date). This hash is the key used in the cache for the file. To decompress archives it relies on external command line programs as determined by the file's extension. If the cache creates an entry and exceeds its max size, it removes entries starting with the least recently accessed. If you add an entry that is by itself over the max size, then it will keep it and remove everything else.
 
 Note: In the event of a power failure or other event that kills the program during decompression, it should fail to write the metadata files. On the next run it will remove any entries with missing metadata and warn you about them on stderr. Things should then proceed without issue.
 
