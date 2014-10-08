@@ -1,11 +1,43 @@
 #!/usr/bin/python
 
 from argparse import ArgumentParser
+from ConfigParser import RawConfigParser
 
 import os.path
+from os import mkdir
 
-DEFAULT_CACHE_LOCATION=os.path.join(os.path.expanduser("~"), ".cache/decompression_cache")
-DEFAULT_MAX_SIZE="1G"
+HOME_LOCATION = os.path.expanduser("~")
+DEFAULT_CACHE_LOCATION = os.path.join(HOME_LOCATION, ".cache/decompression_cache")
+DEFAULT_MAX_SIZE = "1G"
+
+CONFIG_SECTION="Configs"
+
+def __writeConfigFile(configFile, configParser):
+	with open(configFile, "w") as f:
+		configParser.write(f)
+
+def __initConfig(configFile):
+	configParser = RawConfigParser()
+	configParser.add_section(CONFIG_SECTION)
+	configParser.set(CONFIG_SECTION, "max_cache_size", DEFAULT_MAX_SIZE)
+	
+	__writeConfigFile(configFile, configParser)
+
+def __parseConfigFile(configFile, configParser):
+	with open(configFile, "r") as f:
+		configParser.readfp(f)
+
+def __readConfig(configFile):
+	configParser = RawConfigParser()
+	__parseConfigFile(configFile, configParser)
+	global DEFAULT_MAX_SIZE
+	DEFAULT_MAX_SIZE = configParser.get(CONFIG_SECTION, "max_cache_size")
+
+def __readInOrInitConfig(configFile):
+	if not os.path.exists(configFile):
+		__initConfig(configFile)
+	else:
+		__readConfig(configFile)
 
 def __setUpParser():
 	parser = ArgumentParser(prog="cached_decompress", description='Cached file decompressor. Returns the path to the decompressed content.')
@@ -20,24 +52,21 @@ def __parseArgs(args):
 
 def __parseMaxSize(maxSizeArg):
 	if maxSizeArg.endswith("GB"):
-		return int(maxSizeArg[:-2])*1024**3
+		return int(float(maxSizeArg[:-2])*1000**3)
 	elif maxSizeArg.endswith("G"):
-		return int(maxSizeArg[:-1])*1024**3
+		return int(float(maxSizeArg[:-1])*1024**3)
 	elif maxSizeArg.endswith("MB"):
-		return int(maxSizeArg[:-2])*1024**2
+		return int(float(maxSizeArg[:-2])*1000**2)
 	elif maxSizeArg.endswith("M"):
-		return int(maxSizeArg[:-1])*1024**2
-	elif maxSizeArg.endswith("KB"):
-		return int(maxSizeArg[:-2])*1024
+		return int(float(maxSizeArg[:-1])*1024**2)
+	elif maxSizeArg.endswith("kB"):
+		return int(float(maxSizeArg[:-2])*1000)
 	elif maxSizeArg.endswith("K"):
-		return int(maxSizeArg[:-1])*1024
+		return int(float(maxSizeArg[:-1])*1024)
 	elif maxSizeArg.endswith("B"):
 		return int(maxSizeArg[:-1])
 	else:
 		return int(maxSizeArg)
-
-import os.path
-from os import mkdir
 
 def __makeSureDefaultCacheLocationExists():
 	if not os.path.exists(DEFAULT_CACHE_LOCATION):
@@ -46,7 +75,10 @@ def __makeSureDefaultCacheLocationExists():
 from lib.Cache import Cache
 from lib.filehash.ShallowFileHashing import getShallowMD5Hash
 
+CONFIG_LOCATION=os.path.join(HOME_LOCATION, ".config/decompression_cache.conf")
+
 def main(args):
+	__readInOrInitConfig(CONFIG_LOCATION)
 	parsedArguments = __parseArgs(args)
 	archiveFile = parsedArguments.archiveFile
 	cacheLocation = parsedArguments.cache_location
