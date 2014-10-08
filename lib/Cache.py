@@ -32,6 +32,7 @@ def listFolders(directory):
 	return folderNames
 
 from operator import attrgetter
+from sys import stderr
 
 class Cache(object):	
 	def __readOrRemoveCacheEntry(self, entryName):
@@ -40,7 +41,8 @@ class Cache(object):
 			cacheEntry = readCacheEntry(entryPath)
 			self.cacheEntryDict[entryName] = cacheEntry
 		except Exception, e:
-			print "Warning: " + exceptionToString(e)
+			stderr.write("Warning: " + exceptionToString(e) + '\n')
+			stderr.write("Removed entry: %s\n" % entryPath)
 			rmtree(entryPath)
 	
 	def __readCacheEntries(self):

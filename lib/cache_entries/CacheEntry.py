@@ -73,7 +73,7 @@ class CacheEntry(object):
 def __verifyItems(entryPath):
 	items = os.listdir(entryPath)
 	if CONTENT_DIR not in items or SIZE_FILE_NAME not in items or LAST_ACCESSED_FILE_NAME not in items:
-		raise IOError("Cache Entry does not contain expected file and directories")
+		raise IOError("Cache Entry did not contain expected file and directories")
 
 from MicroBinaryIO import readUnsignedLongLongFromFile, readDoubleFromFile
 
