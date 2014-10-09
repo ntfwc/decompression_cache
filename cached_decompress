@@ -27,6 +27,8 @@ DEFAULT_MAX_SIZE = "1G"
 
 CONFIG_SECTION="Configs"
 
+ERROR_MESSAGE_EXAMPLE_MAX_SIZES = "(e.g. 1G, 1.5GB, 200M, 500KB)"
+
 def __writeConfigFile(configFile, configParser):
 	with open(configFile, "w") as f:
 		configParser.write(f)
@@ -47,6 +49,13 @@ def __readConfig(configFile):
 	__parseConfigFile(configFile, configParser)
 	global DEFAULT_MAX_SIZE
 	DEFAULT_MAX_SIZE = configParser.get(CONFIG_SECTION, "max_cache_size")
+	
+	#Check the format of max_cache_size for correctness
+	try:
+		__parseMaxSize(DEFAULT_MAX_SIZE)
+	except:
+		stderr.write("Config file contains improperly formatted max_cache_size. Please replace it with a valid entry %s\n" % ERROR_MESSAGE_EXAMPLE_MAX_SIZES)
+		exit(2)
 
 def __readInOrInitConfig(configFile):
 	if not os.path.exists(configFile):
@@ -102,7 +111,7 @@ def main(args):
 	try:
 		maxSize = __parseMaxSize(parsedArguments.max_size)
 	except:
-		stderr.write("Please give a valid max size (e.g. 1G, 1.5GB, 200M, 500KB)\n")
+		stderr.write("Please give a valid max size %s\n" % ERROR_MESSAGE_EXAMPLE_MAX_SIZES)
 		exit(1)
 	
 	if cacheLocation == DEFAULT_CACHE_LOCATION:
