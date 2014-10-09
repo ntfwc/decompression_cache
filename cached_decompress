@@ -52,9 +52,12 @@ def __readConfig(configFile):
 	
 	#Check the format of max_cache_size for correctness
 	try:
-		__parseMaxSize(DEFAULT_MAX_SIZE)
+		maxSize = __parseMaxSize(DEFAULT_MAX_SIZE)
 	except:
 		stderr.write("Config file contains improperly formatted max_cache_size. Please replace it with a valid entry %s\n" % ERROR_MESSAGE_EXAMPLE_MAX_SIZES)
+		exit(2)
+	if maxSize <= 0:
+		stderr.write("Config file contains max_cache_size that is not greater than zero!\n")
 		exit(2)
 
 def __readInOrInitConfig(configFile):
@@ -112,6 +115,9 @@ def main(args):
 		maxSize = __parseMaxSize(parsedArguments.max_size)
 	except:
 		stderr.write("Please give a valid max size %s\n" % ERROR_MESSAGE_EXAMPLE_MAX_SIZES)
+		exit(1)
+	if maxSize <= 0:
+		stderr.write("Max size must be greater than 0!\n")
 		exit(1)
 	
 	if cacheLocation == DEFAULT_CACHE_LOCATION:
