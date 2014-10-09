@@ -92,6 +92,8 @@ from lib.filehash.ShallowFileHashing import getShallowMD5Hash
 
 CONFIG_LOCATION=os.path.join(HOME_LOCATION, ".config/decompression_cache.conf")
 
+from sys import stderr
+
 def main(args):
 	__readInOrInitConfig(CONFIG_LOCATION)
 	parsedArguments = __parseArgs(args)
@@ -100,8 +102,8 @@ def main(args):
 	try:
 		maxSize = __parseMaxSize(parsedArguments.max_size)
 	except:
-		print "Please give a valid max size (e.g. 1G, 1.5GB, 200M, 500KB)"
-		return
+		stderr.write("Please give a valid max size (e.g. 1G, 1.5GB, 200M, 500KB)\n")
+		exit(1)
 	
 	if cacheLocation == DEFAULT_CACHE_LOCATION:
 		__makeSureDefaultCacheLocationExists()
