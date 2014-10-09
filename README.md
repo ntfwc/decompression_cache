@@ -2,7 +2,7 @@
 It is designed for a GNU/Linux based system, but it may work on others.
 
 #Description
-This is a cache for file decompression. Useful for facilitating efficient access to compressed static content. My original use case was increasing the efficiency of on-the-fly game decompression, similar to how some emulators are able to handle ROMs in zip files. But this could be just as easily applied to archived log or sqlite database access. 
+This is a cache for file decompression. Useful for facilitating efficient access to compressed static content. My original use case was increasing the efficiency of on-the-fly game decompression, similar to how some emulators handle ROMs in zip files. But this could be just as easily applied to archived log or sqlite database access. 
 
 #Technical Description
 It takes an archive file from the command line and returns a path to the decompressed content:
